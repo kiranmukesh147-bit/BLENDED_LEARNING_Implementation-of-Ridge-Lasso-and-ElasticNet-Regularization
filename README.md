@@ -114,7 +114,7 @@ plt.show()
 ```
 
 ## Output:
-<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/f256aba8-4f01-4cd2-b407-83c988c81465" />
+<img width="1536" height="1024" alt="5" src="https://github.com/user-attachments/assets/26554114-d0f6-44c9-9b80-2658a3c70f64" />
 
 
 
