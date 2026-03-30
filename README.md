@@ -1,4 +1,4 @@
-
+# BLENDED_LEARNING
 # Implementation of Ridge, Lasso, and ElasticNet Regularization for Predicting Car Price
 
 ## AIM:
@@ -8,12 +8,11 @@ To implement Ridge, Lasso, and ElasticNet regularization models using polynomial
 1. Hardware – PCs
 2. Anaconda – Python 3.7 Installation / Jupyter notebook
 
-## Algorithm:
-1. Load the car price dataset, select relevant numerical features (enginesize, horsepower, citympg, highwaympg) as input variables, and set price as the target variable. Split the data into training and testing sets.
-2. Apply standardization to the training features using StandardScaler and transform the testing features using the same scaler to ensure consistent feature scaling.
-3. Train a Linear Regression model using the scaled training data, predict prices for the test data, and evaluate model performance using MSE, RMSE, and R-squared metrics along with model coefficients.
-4. Check linearity using actual vs predicted plots, test independence of errors using the Durbin–Watson statistic, assess homoscedasticity through residual plots, and verify normality of residuals using histogram and Q–Q plots.
-
+## Algorithm
+1. Import the required Python libraries and load the car price dataset into the program.
+2. Preprocess the dataset and generate polynomial features using `PolynomialFeatures`.
+3. Build pipelines for Ridge, Lasso, and ElasticNet regression models and train them using the training data.
+4. Evaluate and compare the performance of the models using test data and metrics such as Mean Squared Error (MSE) and R² score.
 
 ## Program:
 ```
@@ -22,81 +21,100 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import Ridge, Lasso,ElasticNet
-from sklearn.preprocessing import PolynomialFeatures,StandardScaler
+from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score
 
-data = pd.read_csv("encoded_car_data (1).csv")
+#Load the dataset
+data= pd.read_csv("encoded_car_data (1).csv")
 data.head()
-df = pd.get_dummies(data, drop_first=True)
+#Data preprocessing 
+#data =data.drop(['CarName','car_ID'],axis=1)
+data = pd.get_dummies(data, drop_first=True)
 
-X = data.drop('price',axis=1)
+#Splitting the data into features and target variable 
+X = data.drop('price', axis=1)
 y = data['price']
 
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state = 42)
-
-
+#Standardizing the features
 scaler = StandardScaler()
 X = scaler.fit_transform(X)
 y = scaler.fit_transform(y.values.reshape(-1,1))
 
-X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2, random_state = 42)
+#Splitting the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-models = {
-    'Ridge': Ridge(alpha=1.0),
-    'Lasso': Lasso(alpha=1.0),
-    'ElasticNet': ElasticNet(alpha=1.0, l1_ratio=0.5)
+#define the models and pipelines
+models ={
+    "Ridge": Ridge(alpha=1.0),
+    "Lasso": Lasso(alpha=1.0),
+    "ElasticNet": ElasticNet(alpha=1.0,l1_ratio=0.5)
 }
 
-results ={}
+#Dictionafry to store results 
+results={}
 
-for name,model in models.items():
-    pipeline = Pipeline([
-        ('poly', PolynomialFeatures(degree=2)),
+#Traom ajd evaluate eac model
+for name, model in models.items():
+    #Create a pipeline with polynomial features and the model
+    pipeline= Pipeline([
+        ('poly',PolynomialFeatures(degree=2)),
         ('regressor', model)
     ])
-
-pipeline.fit(X_train,y_train)
-pred = pipeline.predict(X_test)
-
-mse = mean_squared_error(y_test, pred)
-mae = mean_absolute_error(y_test, pred)
-r2 = r2_score(y_test,pred)
-
-results[name] = {'MSE' : mse, 'MAE' : mae, 'Rscore': r2}
-
-print("Name: SARANYA R")
-print("Reg. No: 212225040384")
+    
+    #Fit the model
+    pipeline.fit(X_train, y_train)
+    
+    #Make predictions
+    predictions= pipeline.predict(X_test)
+    
+    #Calculate performance matrics
+    mse= mean_squared_error(y_test, predictions)
+    r2= r2_score(y_test, predictions)
+    
+    #Store results 
+    results[name]= {'MSE': mse, 'R² Score': r2}
+    
+    
+#Print results
+print('Name: Kiran Mukesh')
+print('Reg_No:212225040188')
 for model_name, metrics in results.items():
-    print(f"{model_name} - \nMean Squared Error: {metrics['MSE']:.2f}, \nMean Absolute Error: {metrics['MAE']:.2f}, \nR Squared Score: {metrics['Rscore']:.2f}")
-
+    print(f"{model_name} - Mean Squared Error: {metrics['MSE']:.2f},R² Score: {metrics['R² Score']:.2f}")
+    
+    
+#Visualization of the results
+#Convert results to DataFrame for easier plotting 
 results_df = pd.DataFrame(results).T
 results_df.reset_index(inplace=True)
-results_df.rename(columns={'index': 'Model'},inplace=True)
+results_df.rename(columns={'index': 'Model'}, inplace=True)
 
+#Set the figure size
 plt.figure(figsize=(12,5))
 
+#Bar plot for MSE
 plt.subplot(1,2,1)
-sns.barplot(x='Model',y='MSE',data=results_df, palette='viridis')
+sns.barplot(x='Model', y='MSE', data=results_df, palette='viridis')
 plt.title('Mean Squared Error (MSE)')
 plt.ylabel('MSE')
 plt.xticks(rotation=45)
 
+
+#Bar plot for R² Score
 plt.subplot(1,2,2)
-sns.barplot(x='Model',y='Rscore', data=results_df,palette='viridis')
-plt.title('R Squared Score')
-plt.ylabel('R Squared Score')
+sns.barplot(x='Model', y='R² Score', data=results_df, palette='viridis')
+plt.title('R² Score')
+plt.ylabel('R² Score')
 plt.xticks(rotation=45)
 
+#Show the plots
 plt.tight_layout()
 plt.show()
 ```
 
 ## Output:
-<img width="197" height="67" alt="image" src="https://github.com/user-attachments/assets/7a51a4b5-e876-4af5-a8b5-a30af88afd55" />
-
-<img width="1292" height="530" alt="image" src="https://github.com/user-attachments/assets/f63b2b9f-d815-4d53-a796-7315d72f9f43" />
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/f256aba8-4f01-4cd2-b407-83c988c81465" />
 
 
 
